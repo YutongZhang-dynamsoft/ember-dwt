@@ -11,16 +11,17 @@
     "test": "tests"
   },
   "scripts": {
-    "build": "ember build --environment=production",
+    "build": "ember build --environment=production && ncp node_modules/dwt/dist public/lib/dwt",
     "lint": "npm-run-all --aggregate-output --continue-on-error --parallel lint:*",
     "lint:hbs": "ember-template-lint .",
     "lint:js": "eslint .",
-    "start": "ember serve",
+    "start": "ncp node_modules/dwt/dist public/lib/dwt && ember serve",
     "test": "npm-run-all lint:* test:*",
     "test:ember": "ember test"
   },
   "devDependencies": {
     "@ember/optional-features": "^2.0.0",
+    "@ember/render-modifiers": "^1.0.2",
     "@glimmer/component": "^1.0.1",
     "@glimmer/tracking": "^1.0.1",
     "babel-eslint": "^10.1.0",
@@ -56,5 +57,9 @@
   },
   "ember": {
     "edition": "octane"
+  },
+  "dependencies": {
+    "dwt": "^16.1.2",
+    "ncp": "^2.0.0"
   }
 }
