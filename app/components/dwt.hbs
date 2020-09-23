@@ -4,3 +4,12 @@
 <div id="dwt-control">
   <button {{ on 'click' this.acquireImage }}>Scan</button>
 </div>
+<div id="upload">
+  {{input value=this.fileName}}
+  <select onchange={{ action "updateValue" value="target.value" }}>
+    {{#each this.formats as |format|}}
+      <option value={{format.id}}>{{{format.text}}}</option>
+    {{/each}}
+  </select>
+  <button {{ on 'click' this.uploadFile }}>Upload</button>
+</div>

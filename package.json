@@ -15,7 +15,7 @@
     "lint": "npm-run-all --aggregate-output --continue-on-error --parallel lint:*",
     "lint:hbs": "ember-template-lint .",
     "lint:js": "eslint .",
-    "start": "ncp node_modules/dwt/dist public/lib/dwt && ember serve",
+    "start": "ncp node_modules/dwt/dist public/lib/dwt && ember serve -proxy http://localhost:53932",
     "test": "npm-run-all lint:* test:*",
     "test:ember": "ember test"
   },

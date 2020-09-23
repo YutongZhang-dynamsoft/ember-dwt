@@ -17,6 +17,13 @@ export default class DwtComponent extends Component {
       height: '100%',
       width: '100%'
     }
+    this.formats = [
+      {id: 'pdf', text: 'pdf'},
+      {id: 'jpg', text: 'jpg'},
+      {id: 'tif', text: 'tif'}
+    ]
+    this.selectFormat = 'pdf'
+    this.fileName = ''
   }
   @action
   acquireImage () {
@@ -42,12 +49,7 @@ export default class DwtComponent extends Component {
             () => { DWObject.CloseSource() }
           )
         }
-    }
-  }
-
-  testAction (foo) {
-    // alert(foo)
-    window.Dynamsoft = Dynamsoft
+      }
   }
   didInsertElement() {
     this.initDwt() 
@@ -57,7 +59,8 @@ export default class DwtComponent extends Component {
     await this.mountDwt()
     await this.bindViewer()
   }
-  mountDwt () {
+  async mountDwt () {
+    await this.unmountDwt()
     return new Promise((res, rej) => {
       const that = this
       const env = Dynamsoft.WebTwainEnv
@@ -80,6 +83,11 @@ export default class DwtComponent extends Component {
     let unmount = function () {
       return Dynamsoft.WebTwainEnv.DeleteDWTObject('')
     }
+    return new Promise((res, rej) => {
+      let result = unmount()
+      if (result) res(result)
+      else rej(result)
+    })
   }
   bindViewer () {
     let options = {
@@ -97,5 +105,52 @@ export default class DwtComponent extends Component {
   }
   getViewerStyle () {
     return `"width: ${this.viewerConfig.width}; height: ${this.viewerConfig.height};"`
+  }
+  @action
+  updateValue (val) {
+    this.selectFormat = val
+  }
+  @action
+  uploadFile () {
+    const host = '127.0.0.1'
+    const protocol = 'http'
+    const uploadPath = '/api/File'
+    let uploadFileName = this.fileName + '.' + this.selectFormat
+    const port = 51065
+
+    let format = (select => {
+              switch (select) {
+                case 'jpg': { return Dynamsoft.EnumDWT_ImageType.IT_JPG }
+                case 'pdf': { return Dynamsoft.EnumDWT_ImageType.IT_PDF }
+                case 'tif': { return Dynamsoft.EnumDWT_ImageType.IT_TIF }
+            }
+        })(this.selectFormat)
+
+        console.log(format)
+
+    let uploadFormat = Dynamsoft.EnumDWT_UploadDataFormat.Binary
+
+    const DWObj = this.dwtConfig.obj
+    if (DWObj) {
+        DWObj.HTTPPort = port
+        DWObj.IfSSL = false
+        let indices = DWObj.SelectedImagesIndices
+        DWObj.HTTPUpload(
+            // protocol + '//' + host + ':' + port + uploadPath,
+            'http://localhost:4200/api/File',
+            indices,
+            format,
+            uploadFormat,  // 0 for binary; 1 for base64
+            uploadFileName,
+            () => { alert('success') },
+            (errCode, errStr, res) => {
+                console.error(`${errCode}: ${errStr}. Server return: ${ res }`)
+            }
+        )
+    }
+  }
+  @action
+  printUpload () {
+    console.log(`to upload: ${this.fileName}.${this.selectFormat}`)
   }
 }
